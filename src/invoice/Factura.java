@@ -38,6 +38,11 @@ public class Factura {
         j=buscarProducto(lf.getProducto().getNombre());
         if (j!=-1){
             this.lineas[j].setCantidad(lineas[j].getCantidad()+lf.getCantidad());
+            //CONTROL: si el descuento se especifica debe ser mayor de cero
+            if (lf.getDescuento()>0){
+                this.lineas[j].setDescuento(lf.getDescuento());//CONTROL: establece el descuento definitivo al agregar un
+                                                                //articulo que ya existe en la factura
+            }
         }else{
         while (i<this.lineas.length && insertado==false){
             if(this.lineas[i]==null){
@@ -130,7 +135,7 @@ public class Factura {
     //ImporteTotalImpuestos(): Devuelve el importe total con el iva(21%).
     public double importeTotalImpuestos(){
         //calculo del importe total más el IVA
-        return round((importeTotal()-descuentoTotal())*1.21);
+        return (importeTotal()-descuentoTotal())*1.21;
     }
 
     
@@ -166,15 +171,15 @@ public class Factura {
     fecha en formato corto, datos del cliente, listado de productos e importe antes y 
     después de impuestos         */
     public String imprimir(){
-        String prod="",hyp="";int i=0;
+        String prod="",impresion,hyp="";int i=0;
         for (i=0;i<this.lineas.length;i++){
-            //saltarse las campos del vector vacio
+            //saltarse las campos del vector vacio.
             if(this.lineas[i]!=null){
                 //listado de productos
-                double desc=round(this.lineas[i].getDescuento()*this.lineas[i].getProducto().getPrecio());
+                double desc=this.lineas[i].getDescuento()*this.lineas[i].getProducto().getPrecio();
                 double descAll=0;
                 descAll+=desc;
-                double descAplic=round(this.lineas[i].getProducto().getPrecio()-desc);
+                double descAplic=this.lineas[i].getProducto().getPrecio()-desc;
                 prod+="\t "+(i+1)+"\t"+this.lineas[i].getCantidad()+"\t  "+
                         this.lineas[i].getProducto().getPrecio()+"\t      "+ //precio por unidad
                         this.lineas[i].getProducto().getPrecio()*this.lineas[i].getCantidad()+"\t"+ //precio 
@@ -185,7 +190,7 @@ public class Factura {
             }
         }
         for (i=0;i<102;i++)hyp+=("-");
-        return "\n\n\n\n\n\n\n\n"
+        impresion= "\n\n\n\n\n\n\n\n"
                 + "\t"+hyp+"\n\tFACTURA DE VENTA.\n\t"+hyp+"\n"+
                 "\tNº "+this.numero+"\t"+
                 "\tFecha: "+fecha.corta()+
@@ -196,10 +201,12 @@ public class Factura {
                 "\tPRODUCTOS\n\t"+hyp+"\n"+
                 "\tItem.  Cant.     Precio U.    Precio   Dto-%\tDto-€\tSubt    Descripción:\n"+prod+"\n\t"+
                 hyp+
-                "\n\t\tSutotal: \t"+round(importeTotal())+" €\n"+
-                "\t\tDesc: \t\t"+round(descuentoTotal())+" €\n"+
-                "\t\tSutotal: \t"+round(importeTotal()-descuentoTotal())+" €\n"+
-                "\t\tIVA: \t\t"+round((importeTotal()-descuentoTotal())*0.21)+" €\n"+
-                "\t\tTotal: \t\t"+round(importeTotalImpuestos())+" €\n\n";
+                "\n\t\tSutotal: \t"+importeTotal()+" €\n"+
+                "\t\tDesc: \t\t"+descuentoTotal()+" €\n"+
+                "\t\tSutotal: \t"+(importeTotal()-descuentoTotal())+" €\n"+
+                "\t\tIVA: \t\t"+(importeTotal()-descuentoTotal())*0.21+" €\n"+
+                "\t\tTotal: \t\t"+importeTotalImpuestos()+" €\n\n";
+        
+        return impresion;
     }
 }
