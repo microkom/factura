@@ -76,9 +76,6 @@ public class Main {
         
         System.out.print(factura.imprimir());
         
-        
-        //System.out.println("\tlinea de pendrive= "+factura.buscarProducto("Pendrive 32 GB")+"");
-       
         /*
         MEJORAS:
         
