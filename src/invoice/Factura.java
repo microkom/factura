@@ -10,6 +10,8 @@ public class Factura {
     private Fecha fecha;
     private LineaFactura[] lineas = new LineaFactura[10];
     
+    Textos texto = new Textos();
+    
     public Factura(int numero, Cliente cliente, Fecha fecha){
         this.numero=numero;
         this.cliente=cliente;
@@ -33,34 +35,34 @@ public class Factura {
     */
     public int nuevaLinea(LineaFactura lf){
         int vector=-1;
-        int i=0,j;
+        int i,j;
         boolean insertado=false;
+        
         j=buscarProducto(lf.getProducto().getNombre());
+        
+        //comprobación de que el producto ya aparece en la factura o no 
         if (j!=-1){
+            //suma de cantidades 
             this.lineas[j].setCantidad(lineas[j].getCantidad()+lf.getCantidad());
-            //CONTROL: si el descuento se especifica debe ser mayor de cero
-            if (lf.getDescuento()>0){
-                this.lineas[j].setDescuento(lf.getDescuento());//CONTROL: establece el descuento definitivo al agregar un
-                                                                //articulo que ya existe en la factura
-            }
+            this.lineas[j].setDescuento(lf.getDescuento());
         }else{
-        while (i<this.lineas.length && insertado==false){
+        for (i=0;i<this.lineas.length && insertado==false;i++){
             if(this.lineas[i]==null){
                 lineas[i]=lf;
                 insertado=true;
                 vector=i;
             }
-            i++;
         }
         }
         return vector;
     }
 
-    
     //borrarLineaNumero(int numLinea) : Elimina la linea con el número indicado
     public void borrarLineaNumero(int numLinea){
         //borrado del vector recibiendo la posición exacta 
         this.lineas[numLinea]=null;
+        
+        //agrupar el contenido del vector al inicio
         ordenVector();
     }
     
@@ -87,9 +89,8 @@ public class Factura {
     borrarLineaNombre(String nombre): Elimina la linea con el producto indicado 
     (buscar por nombre de producto).                                        */
     public void borrarLineaNombre(String nombre){
-        int i=0;
         boolean encontrado=false;
-        while(i<this.lineas.length && encontrado==false){
+        for(int i=0;i<this.lineas.length && encontrado==false;i++){
              //saltarse las campos del vector vacio
             if(lineas[i]!=null){
                 //busqueda del nombre recibido por parametro con el vector actual en i
@@ -98,8 +99,7 @@ public class Factura {
                     this.lineas[i]=null;
                     encontrado=true;
                 }
-            }    
-            i++;
+            } 
         }
         ordenVector();
     }
@@ -110,11 +110,10 @@ public class Factura {
         double total=0;int i;
         for (i=0;i<this.lineas.length;i++){
             //saltarse las campos del vector vacio
-            double desc=0;
+            
             if(this.lineas[i]!=null){
                 //sumar los precios de todos los productos
-                //desc=this.lineas[i].getProducto().getPrecio()*this.lineas[i].getCantidad()*this.lineas[i].getDescuento();
-                total+=(this.lineas[i].getProducto().getPrecio()*this.lineas[i].getCantidad())-desc;
+                total+=(this.lineas[i].getProducto().getPrecio()*this.lineas[i].getCantidad());
             }
         }                
         return total;
@@ -137,9 +136,7 @@ public class Factura {
         //calculo del importe total más el IVA
         return (importeTotal()-descuentoTotal())*1.21;
     }
-
     
-
     /*
     buscarProducto(String nombre): Buscar si una factura tiene un
     determinado el producto indicado en una de sus lineas. Debe
@@ -147,9 +144,9 @@ public class Factura {
     que no.
     */
     public int buscarProducto(String nombre){
-        int numLinea=-1,i=0;
+        int numLinea=-1,i;
         boolean found=false;
-        while(i<lineas.length && found==false){
+        for(i=0;i<lineas.length && found==false;i++){
             //saltarse las campos del vector vacio
             if(lineas[i]!=null){
                 //comparar los nombres del producto con el que han pasado por parametro
@@ -160,8 +157,6 @@ public class Factura {
                     found=true;
                 }
             }
-            //incremento del recorrido
-            i++;
         }
         return numLinea;
     }
@@ -171,42 +166,88 @@ public class Factura {
     fecha en formato corto, datos del cliente, listado de productos e importe antes y 
     después de impuestos         */
     public String imprimir(){
-        String prod="",impresion,hyp="";int i=0;
+        String prod="",impreso1="",impreso2="";
+        int i;
+        boolean error=false;
         for (i=0;i<this.lineas.length;i++){
-            //saltarse las campos del vector vacio.
+            
+            //saltarse las campos del vector vacio
             if(this.lineas[i]!=null){
-                //listado de productos
+                
+                //descuentos individuales
                 double desc=this.lineas[i].getDescuento()*this.lineas[i].getProducto().getPrecio();
-                double descAll=0;
-                descAll+=desc;
+                
+                //descuentos aplicados por producto
                 double descAplic=this.lineas[i].getProducto().getPrecio()-desc;
-                prod+="\t "+(i+1)+"\t"+this.lineas[i].getCantidad()+"\t  "+
+                
+                //listado de productos con detalle de precio unitario, descuentos y subtotal
+                
+                //control de cantidades iguales o menores que cero
+                if (this.lineas[i].getCantidad()<=0){
+                    error=true;
+                    prod+=texto.errors("cantidad");
+                    prod+=this.lineas[i].getProducto().getDescripcion()+"\n";
+                    
+                //control de precios iguales o menores que cero
+                }else if(this.lineas[i].getProducto().getPrecio()<=0){
+                    error=true;
+                    prod+=texto.errors("precio");
+                    prod+=this.lineas[i].getProducto().getDescripcion()+"\n";
+                
+                //control de descuentos negativos
+                }else if(this.lineas[i].getDescuento()<0){
+                    error=true;
+                    prod+=texto.errors("descuento");
+                    prod+=this.lineas[i].getProducto().getDescripcion()+"\n";
+                }else{    
+                prod+="\t "+(i+1)+"\t"+this.lineas[i].getCantidad()+"\t  "+ //nº de item y cantidad
                         this.lineas[i].getProducto().getPrecio()+"\t      "+ //precio por unidad
                         this.lineas[i].getProducto().getPrecio()*this.lineas[i].getCantidad()+"\t"+ //precio 
                         this.lineas[i].getDescuento()*100+"\t"+             //descuento en porcentaje
                         desc*this.lineas[i].getCantidad()+"\t"+             //descuento en euros
-                        descAplic*this.lineas[i].getCantidad()+"\t"+        //subtotal cuenta por unidad
-                        this.lineas[i].getProducto().getDescripcion()+"\n";
+                        descAplic*this.lineas[i].getCantidad()+"\t";        //subtotal cuenta por unidad
+                        
+                prod+=this.lineas[i].getProducto().getDescripcion()+"\n";   //Descripcion del producto
+                }
             }
         }
-        for (i=0;i<102;i++)hyp+=("-");
-        impresion= "\n\n\n\n\n\n\n\n"
-                + "\t"+hyp+"\n\tFACTURA DE VENTA.\n\t"+hyp+"\n"+
-                "\tNº "+this.numero+"\t"+
-                "\tFecha: "+fecha.corta()+
-                "\tNIF: "+cliente.getNif()+"\n"+
-                "\tNombre: "+cliente.getNombre()+"\t"+
-                "Dirección: "+cliente.getDireccion()+"     "+
-                "Teléfono: "+cliente.getTelefono()+"\n\t"+hyp+"\n"+
-                "\tPRODUCTOS\n\t"+hyp+"\n"+
-                "\tItem.  Cant.     Precio U.    Precio   Dto-%\tDto-€\tSubt    Descripción:\n"+prod+"\n\t"+
-                hyp+
-                "\n\t\tSutotal: \t"+importeTotal()+" €\n"+
-                "\t\tDesc: \t\t"+descuentoTotal()+" €\n"+
-                "\t\tSutotal: \t"+(importeTotal()-descuentoTotal())+" €\n"+
-                "\t\tIVA: \t\t"+(importeTotal()-descuentoTotal())*0.21+" €\n"+
-                "\t\tTotal: \t\t"+importeTotalImpuestos()+" €\n\n";
-        
-        return impresion;
+       
+        impreso1=   "\n\n\n\n\n\n\n\n"
+                    + "\t"+texto.hyphen()+"\n\t"+
+                    texto.factura()+"\n\t"+
+                    texto.hyphen()+"\n"+
+                    "\tNº "+this.numero+"\t"+
+                    "\tFecha: "+fecha.corta()+
+                    "\tNIF: "+cliente.getNif()+"\n"+
+                    "\tNombre: "+cliente.getNombre()+"\t"+
+                    "Dirección: "+cliente.getDireccion()+"     "+
+                    "Teléfono: "+cliente.getTelefono()+"\n\t"+
+                    texto.hyphen()+"\n"+
+                    "\tPRODUCTOS\n\t"+
+                    texto.hyphen()+"\n"+
+                    "\tItem.  Cant.     Precio U.    Precio   Dto-%\tDto-€\tSubt    Descripción:\n";
+        if (error==false){
+            //valores a imprimir si no hay errores en la factura
+            impreso2=   prod+        
+                        "\t"+
+                        texto.hyphen()+"\n"+
+                        "\t\tSutotal: \t"+importeTotal()+" €\n"+
+                        "\t\tDesc: \t\t"+descuentoTotal()+" €\n"+
+                        "\t\tSutotal: \t"+(importeTotal()-descuentoTotal())+" €\n"+
+                        "\t\tIVA: \t\t"+(importeTotal()-descuentoTotal())*0.21+" €\n"+
+                        "\t\tTotal: \t\t"+importeTotalImpuestos()+" €\n\n"+
+                       "\t"+texto.hyphen()+"\n";
+       }else{
+           //No se muestran valores hasta que no se solucionen errores de cantidad o precio, iguales a cero o negat.
+            impreso2=   prod+        
+                        "\t"+texto.hyphen()+"\n"+
+                        "\t\tSutotal: \t===  €\n"+
+                        "\t\tDesc: \t\t===  €\n"+
+                        "\t\tSutotal: \t===  €\n"+
+                        "\t\tIVA: \t\t===  €\n"+
+                        "\t\tTotal: \t"+texto.errors("")+" \n"+" \n"+
+                        "\t"+texto.hyphen()+"\n";
+       }
+    return impreso1+impreso2;
     }
 }

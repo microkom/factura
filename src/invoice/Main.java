@@ -52,7 +52,7 @@ public class Main {
         }while((direccion.equals(null)));
       */  
        Cliente cliente = new Cliente(nif,nombre,direccion,telefono);
-       
+    /*   
        do{
        System.out.println("Qué produdcto quiere comprar: ");
        System.out.println("1. "+proDescripcion1);
@@ -64,7 +64,7 @@ public class Main {
        
        
        
-       }while (opcion>1 || opcion<=4);
+       }while (opcion>1 || opcion<=4);*/
        Factura factura = new Factura(1,cliente,hoy);
         
         Producto pro[] =new Producto[10];
@@ -75,18 +75,18 @@ public class Main {
         factura.nuevaLinea(linea1);
                 
         Producto producto2 = new Producto(proCodigo2,proNombre2,proDescripcion2,100);
-        LineaFactura linea2 = new LineaFactura(producto2,10,2);
+        LineaFactura linea2 = new LineaFactura(producto2,10,-2);
         factura.nuevaLinea(linea2);
                 
         Producto producto3 = new Producto(proCodigo3,proNombre3,proDescripcion3,10);
-        LineaFactura linea3 = new LineaFactura(producto3,7,3);
-        LineaFactura linea4 = new LineaFactura(producto3,37,1);
+        LineaFactura linea3 = new LineaFactura(producto3,10,10);
         factura.nuevaLinea(linea3);
-        factura.nuevaLinea(linea4);
+         //LineaFactura linea4 = new LineaFactura(producto3,37,1);
+        //factura.nuevaLinea(linea4);
         
         
         System.out.print(factura.imprimir());
-        factura.borrarLineaNumero(0);
+        //factura.borrarLineaNumero(0);
         //factura.borrarLineaNombre("Sandisk ssd 240");
         
         //System.out.print(factura.imprimir());
