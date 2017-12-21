@@ -41,14 +41,4 @@ public class Fecha {
     public String corta(){
         return this.day+"-"+this.month+"-"+this.year;
     }
-
-    public Fecha hoy(){
-        Calendar cal = Calendar.getInstance();
-        int dia=cal.get(Calendar.DAY_OF_MONTH);
-        int mes=cal.get(Calendar.MONTH)+1;
-        int anyo=cal.get(Calendar.YEAR);
-         
-        Fecha today = new Fecha(dia,mes,anyo);
-        return today;
-    }
 }

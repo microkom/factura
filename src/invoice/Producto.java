@@ -22,12 +22,4 @@ public class Producto {
     public void setNombre(String nombre){this.nombre=nombre;}
     public void setDescripcion(String descripcion){this.descripcion=descripcion;}
     public void setPrecio(double precio){this.precio=precio;}
-    
-    
-
-
-
-
-
-
 }

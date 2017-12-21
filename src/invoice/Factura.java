@@ -212,7 +212,7 @@ public class Factura {
             }
         }
        
-        impreso1=   "\n\n\n\n\n\n\n\n"
+        impreso1=   "\n\n\n\n"
                     + "\t"+texto.hyphen()+"\n\t"+
                     texto.factura()+"\n\t"+
                     texto.hyphen()+"\n"+

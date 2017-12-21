@@ -51,45 +51,30 @@ public class Main {
         direccion=sc.next();
         }while((direccion.equals(null)));
       */  
-       Cliente cliente = new Cliente(nif,nombre,direccion,telefono);
-    /*   
-       do{
-       System.out.println("Qué produdcto quiere comprar: ");
-       System.out.println("1. "+proDescripcion1);
-       System.out.println("2. "+proDescripcion2);
-       System.out.println("3. "+proDescripcion3);
-       System.out.println("4. Terminar");
-       
-       opcion=sc.nextInt();
-       
-       
-       
-       }while (opcion>1 || opcion<=4);*/
-       Factura factura = new Factura(1,cliente,hoy);
-        
-        Producto pro[] =new Producto[10];
-        LineaFactura linea[]=new LineaFactura[10];
+        Cliente cliente = new Cliente(nif,nombre,direccion,telefono);
+      
+        Factura factura = new Factura(1,cliente,hoy);
         
         Producto producto1 = new Producto(proCodigo1,proNombre1,proDescripcion1,200);
         LineaFactura linea1 = new LineaFactura(producto1,2,1);
         factura.nuevaLinea(linea1);
                 
         Producto producto2 = new Producto(proCodigo2,proNombre2,proDescripcion2,100);
-        LineaFactura linea2 = new LineaFactura(producto2,10,-2);
+        LineaFactura linea2 = new LineaFactura(producto2,10,5);
         factura.nuevaLinea(linea2);
                 
         Producto producto3 = new Producto(proCodigo3,proNombre3,proDescripcion3,10);
         LineaFactura linea3 = new LineaFactura(producto3,10,10);
         factura.nuevaLinea(linea3);
-         //LineaFactura linea4 = new LineaFactura(producto3,37,1);
-        //factura.nuevaLinea(linea4);
         
-        
+        LineaFactura linea4 = new LineaFactura(producto3,37,1);
+        factura.nuevaLinea(linea4);
+                
         System.out.print(factura.imprimir());
-        //factura.borrarLineaNumero(0);
+        factura.borrarLineaNumero(0);
         //factura.borrarLineaNombre("Sandisk ssd 240");
         
-        //System.out.print(factura.imprimir());
+        System.out.print(factura.imprimir());
         
         
         //System.out.println("\tlinea de pendrive= "+factura.buscarProducto("Pendrive 32 GB")+"");
@@ -97,8 +82,11 @@ public class Main {
         /*
         MEJORAS:
         
+        - la cantidad del artículo tiene que ser mayor que cero
+        - el precio del artículo tiene que ser mayor que cero
+        - el descuento del artículo tiene que ser mayor que cero
         - si el descuento se especifica debe ser mayor de cero
-        - al agregar un articulo que ya existe en la factura el descuento establecido establece el descuento definitivo
+        - al agregar un articulo que ya existe en la factura el último descuento es el definitivo para el artículo
         - desfragmentación del vector LineaFactura cuando se borra una linea y tiene espacios en blanco: ordenVector()
         - se muestra por pantalla:
             precio unitario

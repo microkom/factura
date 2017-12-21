@@ -1,6 +1,5 @@
 package invoice;
 
-
 public class Cliente {
     private String nif;
     private String nombre;
